@@ -1,0 +1,32 @@
+{
+  "name": "a3-redsox-stats",
+  "version": "1.0.0",
+  "description": "Boston Red Sox Player Statistics Tracker - A3 Assignment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "baseball",
+    "statistics",
+    "web-application"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "mongodb": "^6.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

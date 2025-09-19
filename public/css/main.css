@@ -1,0 +1,192 @@
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body and Container */
+body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: #0C2340; /* Red Sox navy blue */
+  color: #FFFFFF;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #BD3039; /* Red Sox red */
+  border-radius: 8px;
+}
+
+h1, h2 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+/* Form Section */
+.form-section {
+  background-color: #FFFFFF;
+  color: #0C2340;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.form-section h2 {
+  margin-bottom: 20px;
+  color: #BD3039;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button[type="submit"] {
+  background-color: #BD3039;
+  color: #FFFFFF;
+}
+
+button[type="button"] {
+  background-color: #868686;
+  color: #FFFFFF;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Table Section */
+.stats-section {
+  background-color: #FFFFFF;
+  color: #0C2340;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.stats-section h2 {
+  margin-bottom: 20px;
+  color: #BD3039;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+th {
+  background-color: #0C2340;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: #F2F2F2;
+}
+
+tr:hover {
+  background-color: #E9E9E9;
+}
+
+.action-btn {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.edit-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #BD3039;
+  color: white;
+}
+
+/* Flexbox layout for form and table */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  main {
+    flex-direction: row;
+  }
+  
+  .form-section {
+    flex: 1;
+  }
+  
+  .stats-section {
+    flex: 2;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .form-buttons {
+    flex-direction: column;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+  }
+}

@@ -1,6 +1,6 @@
 # Boston Red Sox Player Statistics Tracker
 
-**Live Application:** [Your Render URL Here]
+**Live Application:** https://a3-ethanknorring.onrender.com/
 
 ## Project Overview
 
@@ -188,7 +188,8 @@ ChatGPT was used as a resource similar to Google, StackOverflow, and other onlin
 
 - Clarification of the assignment requirements.
 - Examples of CSS frameworks and session secret keys
-- Ideas for how to implement the technical and design achievements
+- Ideas for how to implement the technical and design achievement
+- Readme formatting
 
 I reviewed and edited all generated examples to make sure I understood them and that they met the assignment requirements.
 All final code and design choices were my own.

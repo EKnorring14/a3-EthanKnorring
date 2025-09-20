@@ -13,6 +13,23 @@
       font-family: 'Open Sans', sans-serif;
     }
     
+    /* Skip navigation link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: #000;
+      color: #fff;
+      padding: 8px;
+      text-decoration: none;
+      border-radius: 4px;
+      z-index: 100;
+    }
+    
+    .skip-link:focus {
+      top: 6px;
+    }
+    
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -101,48 +118,72 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <div class="login-container">
-    <div class="login-card">
-      <div class="card-header">
-        <h1>🏟️ Red Sox Stats</h1>
-        <p class="mb-0">Player Statistics Tracker</p>
-      </div>
-      <div class="card-body">
-        <div class="info-text">
-          <strong>Note:</strong> If you don't have an account, simply enter a username and password to create a new account automatically.
-        </div>
-        
-        <div id="message" class="alert" style="display: none;"></div>
-        
-        <form id="login-form">
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" required 
-                   placeholder="Enter your username">
+    <main id="main-content">
+      <div class="login-card">
+        <header class="card-header">
+          <h1>🏟️ Red Sox Stats</h1>
+          <p class="mb-0">Player Statistics Tracker</p>
+        </header>
+        <div class="card-body">
+          <div class="info-text" role="note" aria-label="Account creation information">
+            <strong>Note:</strong> If you don't have an account, simply enter a username and password to create a new account automatically.
           </div>
           
-          <div class="mb-4">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" required 
-                   placeholder="Enter your password">
-          </div>
+          <div id="message" class="alert" style="display: none;" role="alert" aria-live="polite" aria-atomic="true"></div>
           
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary">
-              <span id="btn-text">Login / Create Account</span>
-              <span id="btn-spinner" class="spinner-border spinner-border-sm ms-2" 
-                    style="display: none;" role="status" aria-hidden="true"></span>
-            </button>
-          </div>
-        </form>
-        
-        <div class="text-center mt-4">
-          <small class="text-muted">
-            Demo accounts will be created automatically for new usernames
-          </small>
+          <form id="login-form" novalidate>
+            <fieldset>
+              <legend class="visually-hidden">Login Credentials</legend>
+              
+              <div class="mb-3">
+                <label for="username" class="form-label">
+                  Username <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input type="text" class="form-control" id="username" required 
+                       placeholder="Enter your username" aria-describedby="username-help"
+                       autocomplete="username" minlength="3" maxlength="50">
+                <div id="username-help" class="form-text">
+                  Username must be 3-50 characters long
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label for="password" class="form-label">
+                  Password <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input type="password" class="form-control" id="password" required 
+                       placeholder="Enter your password" aria-describedby="password-help"
+                       autocomplete="current-password" minlength="6">
+                <div id="password-help" class="form-text">
+                  Password must be at least 6 characters long
+                </div>
+              </div>
+            </fieldset>
+            
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary" aria-describedby="btn-help">
+                <span id="btn-text">Login / Create Account</span>
+                <span id="btn-spinner" class="spinner-border spinner-border-sm ms-2" 
+                      style="display: none;" role="status" aria-hidden="true">
+                  <span class="visually-hidden">Loading...</span>
+                </span>
+              </button>
+              <div id="btn-help" class="form-text text-center mt-2">
+                Press Enter or click to submit form
+              </div>
+            </div>
+          </form>
+          
+          <footer class="text-center mt-4">
+            <small class="text-muted">
+              Demo accounts will be created automatically for new usernames
+            </small>
+          </footer>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -51,11 +51,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update player count
     playerCount.textContent = `${players.length} player${players.length !== 1 ? 's' : ''}`;
     
+    // Screen reader announcement for data updates
+    announceToScreenReader(`Player table updated. ${players.length} player${players.length !== 1 ? 's' : ''} displayed.`);
+    
     if (players.length === 0) {
       playersTable.innerHTML = `
         <tr>
           <td colspan="7" class="text-center text-muted py-4">
-            <i class="bi bi-inbox display-4"></i>
+            <i class="bi bi-inbox display-4" aria-hidden="true"></i>
             <p class="mt-2">No players added yet. Add your first player using the form!</p>
           </td>
         </tr>
@@ -63,38 +66,44 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    players.forEach(player => {
+    players.forEach((player, index) => {
       const row = document.createElement('tr');
       
       row.innerHTML = `
         <td>
           <div class="d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 text-primary"></i>
+            <i class="bi bi-person-circle me-2 text-primary" aria-hidden="true"></i>
             <strong>${escapeHtml(player.name)}</strong>
           </div>
         </td>
         <td>
-          <span class="position-badge">${escapeHtml(player.position)}</span>
+          <span class="position-badge" title="${getPositionFullName(player.position)}">${escapeHtml(player.position)}</span>
         </td>
         <td>
-          <span class="stats-badge">${player.avg.toFixed(3)}</span>
+          <span class="stats-badge" title="Batting Average">${player.avg.toFixed(3)}</span>
         </td>
         <td>
-          <span class="stats-badge">${player.obp.toFixed(3)}</span>
+          <span class="stats-badge" title="On-Base Percentage">${player.obp.toFixed(3)}</span>
         </td>
         <td>
-          <span class="stats-badge">${player.slg.toFixed(3)}</span>
+          <span class="stats-badge" title="Slugging Percentage">${player.slg.toFixed(3)}</span>
         </td>
         <td>
-          <span class="stats-badge">${player.ops.toFixed(3)}</span>
+          <span class="stats-badge" title="On-base Plus Slugging">${player.ops.toFixed(3)}</span>
         </td>
         <td>
-          <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-warning edit-btn" data-id="${player._id}" title="Edit Player">
-              <i class="bi bi-pencil"></i>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Actions for ${escapeHtml(player.name)}">
+            <button class="btn btn-warning edit-btn" data-id="${player._id}" 
+                    title="Edit ${escapeHtml(player.name)}" 
+                    aria-label="Edit player ${escapeHtml(player.name)}">
+              <i class="bi bi-pencil" aria-hidden="true"></i>
+              <span class="visually-hidden">Edit</span>
             </button>
-            <button class="btn btn-danger delete-btn" data-id="${player._id}" title="Delete Player">
-              <i class="bi bi-trash"></i>
+            <button class="btn btn-danger delete-btn" data-id="${player._id}" 
+                    title="Delete ${escapeHtml(player.name)}" 
+                    aria-label="Delete player ${escapeHtml(player.name)}">
+              <i class="bi bi-trash" aria-hidden="true"></i>
+              <span class="visually-hidden">Delete</span>
             </button>
           </div>
         </td>
@@ -120,16 +129,75 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Escape HTML to prevent XSS
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  // Get full position name for accessibility
+  function getPositionFullName(position) {
+    const positions = {
+      'C': 'Catcher',
+      '1B': 'First Base',
+      '2B': 'Second Base', 
+      '3B': 'Third Base',
+      'SS': 'Shortstop',
+      'LF': 'Left Field',
+      'CF': 'Center Field',
+      'RF': 'Right Field',
+      'DH': 'Designated Hitter',
+      'P': 'Pitcher'
+    };
+    return positions[position] || position;
+  }
+
+  // Screen reader announcements
+  function announceToScreenReader(message) {
+    const announcer = document.getElementById('sr-announcements');
+    if (announcer) {
+      announcer.textContent = message;
+      // Clear after announcement
+      setTimeout(() => {
+        announcer.textContent = '';
+      }, 1000);
+    }
+  }
+
+  // Enhanced form validation
+  function validateForm() {
+    const form = document.getElementById('player-form');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+      const value = input.value.trim();
+      
+      // Reset validation state
+      input.classList.remove('is-invalid', 'is-valid');
+      
+      if (!value) {
+        input.classList.add('is-invalid');
+        isValid = false;
+      } else if (input.type === 'number') {
+        const num = parseFloat(value);
+        if (isNaN(num) || num < 0 || num > 1) {
+          input.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          input.classList.add('is-valid');
+        }
+      } else {
+        input.classList.add('is-valid');
+      }
+    });
+    
+    return isValid;
   }
 
   // Handle form submission (add or update player)
   playerForm.addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    // Enhanced client-side validation
+    if (!validateForm()) {
+      announceToScreenReader('Please fix the errors in the form before submitting.');
+      return;
+    }
     
     const playerId = document.getElementById('player-id').value;
     const playerData = {
@@ -140,19 +208,28 @@ document.addEventListener('DOMContentLoaded', function() {
       slg: parseFloat(document.getElementById('slg').value)
     };
     
-    // Basic validation
-    if (!playerData.name) {
-      alert('Please enter a player name');
+    // Additional validation with user feedback
+    if (!playerData.name || playerData.name.length < 1) {
+      showToast('Please enter a player name', 'error');
+      document.getElementById('name').focus();
       return;
     }
     
     if (!playerData.position) {
-      alert('Please select a position');
+      showToast('Please select a position', 'error');
+      document.getElementById('position').focus();
       return;
     }
     
     if (isNaN(playerData.avg) || isNaN(playerData.obp) || isNaN(playerData.slg)) {
-      alert('Please enter valid numbers for all statistics');
+      showToast('Please enter valid numbers for all statistics', 'error');
+      return;
+    }
+    
+    if (playerData.avg < 0 || playerData.avg > 1 || 
+        playerData.obp < 0 || playerData.obp > 1 || 
+        playerData.slg < 0 || playerData.slg > 1) {
+      showToast('All statistics must be between 0.000 and 1.000', 'error');
       return;
     }
     
@@ -183,8 +260,11 @@ document.addEventListener('DOMContentLoaded', function() {
         displayPlayers(players);
         resetForm();
         
-        // Show success message
-        showToast(playerId ? 'Player updated successfully!' : 'Player added successfully!', 'success');
+        // Show success message with screen reader announcement
+        const action = playerId ? 'updated' : 'added';
+        const message = `Player ${playerData.name} ${action} successfully!`;
+        showToast(message, 'success');
+        announceToScreenReader(message);
       } else if (response.status === 401) {
         window.location.href = '/login';
       } else {
@@ -192,7 +272,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } catch (error) {
       console.error('Error saving player:', error);
-      showToast('Error saving player. Please try again.', 'error');
+      const errorMessage = 'Error saving player. Please try again.';
+      showToast(errorMessage, 'error');
+      announceToScreenReader(errorMessage);
     }
   });
 
@@ -207,13 +289,15 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('obp').value = player.obp;
       document.getElementById('slg').value = player.slg;
       
-      formTitle.innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Player';
-      submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Update Player';
+      formTitle.innerHTML = '<i class="bi bi-pencil me-2" aria-hidden="true"></i>Edit Player';
+      submitBtn.innerHTML = '<i class="bi bi-check-circle me-1" aria-hidden="true"></i>Update Player';
       cancelBtn.style.display = 'inline-block';
       editingId = id;
       
       // Scroll to form
       document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+      
+      announceToScreenReader(`Now editing player ${player.name}`);
     }
   }
 
@@ -233,7 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
             resetForm();
           }
           
-          showToast('Player deleted successfully!', 'success');
+          showToast(`Player ${playerName} deleted successfully!`, 'success');
+          announceToScreenReader(`Player ${playerName} deleted`);
         } else if (response.status === 401) {
           window.location.href = '/login';
         } else {
@@ -250,10 +335,28 @@ document.addEventListener('DOMContentLoaded', function() {
   function resetForm() {
     playerForm.reset();
     document.getElementById('player-id').value = '';
-    formTitle.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Add New Player';
-    submitBtn.innerHTML = '<i class="bi bi-plus-circle me-1"></i>Add Player';
+    formTitle.innerHTML = '<i class="bi bi-person-plus-fill me-2" aria-hidden="true"></i>Add New Player';
+    submitBtn.innerHTML = '<i class="bi bi-plus-circle me-1" aria-hidden="true"></i>Add Player';
     cancelBtn.style.display = 'none';
     editingId = null;
+    
+    // Clear validation states
+    const inputs = playerForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.classList.remove('is-invalid', 'is-valid');
+    });
+    
+    // Focus first input for keyboard users
+    document.getElementById('name').focus();
+    
+    announceToScreenReader('Form reset to add new player mode');
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // Make resetForm available globally
